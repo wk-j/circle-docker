@@ -23,7 +23,6 @@ jobs:
         name: Build and publish
         command: |
           ~/.dotnet/tools/dotnet-cake -target=Publish
-          docker-compose build
 
     - save_cache:
         paths:
