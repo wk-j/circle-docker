@@ -49,6 +49,6 @@ workflows:
   main:
     jobs:
       - build
-      - build-docker:
+      - build-image:
           requires:
             - build
