@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/app
 
     docker:
-    - image: circleci/openjdk:8-jdk-stretch
+      - image: mcr.microsoft.com/dotnet/core/sdk:2.2h
 
     steps:
     - setup_remote_docker
