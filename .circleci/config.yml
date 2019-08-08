@@ -11,22 +11,16 @@ jobs:
     - checkout
 
     - restore_cache:
-        key: app-{{ checksum "pom.xml" }}
+        key: app-{{ checksum "src/MyWeb/MyWeb.csproj" }}
 
     - run: |
-        mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DbuildId=${CIRCLE_BUILD_NUM}
-        mkdir jar
-        cp target/*.jar jar
+        dotnet tool install -g cake.tool
+
+    - run: |
+        ~/.dotnet/tools/dotnet-cake -target=Publish
+        docker-compose build
 
     - save_cache:
         paths:
         - ~/.m2
-        key: app-{{ checksum "pom.xml" }}
-
-    - persist_to_workspace:
-          root: .
-          paths:
-            - jar
-
-    - store_artifacts:
-        path: jar
+        key: app-{{ checksum "src/MyWeb/MyWeb.csproj" }}
