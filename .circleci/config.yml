@@ -7,7 +7,10 @@ jobs:
       - image: mcr.microsoft.com/dotnet/core/sdk:2.2
 
     steps:
-    - setup_remote_docker
+
+    # - setup_remote_docker:
+    #     docker_layer_caching: true # (3)
+
     - checkout
 
     - restore_cache:
@@ -16,11 +19,37 @@ jobs:
     - run: |
         dotnet tool install -g cake.tool
 
-    - run: |
-        ~/.dotnet/tools/dotnet-cake -target=Publish
-        docker-compose build
+    - run:
+        name: Build and publish
+        command: |
+          ~/.dotnet/tools/dotnet-cake -target=Publish
+          docker-compose build
 
     - save_cache:
         paths:
         - ~/.m2
         key: app-{{ checksum "src/MyWeb/MyWeb.csproj" }}
+
+    - persist_to_workspace:
+          root: .
+          paths:
+            - .publish
+            - Dockerfile
+
+  build-image:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: .
+      - run: |
+          docker-compose build
+
+workflows:
+  version: 2
+
+  main:
+    jobs:
+      - build
+      - build-docker:
+          requires:
+            - build
